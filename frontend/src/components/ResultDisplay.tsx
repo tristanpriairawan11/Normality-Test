@@ -2,9 +2,25 @@
 
 import { Download, FileText, CheckCircle2, XCircle, Calculator } from "lucide-react";
 
-export function ResultDisplay() {
-  // Hardcoded for demonstration purposes since this is frontend-only
-  const isNormal = true;
+export interface CalculateResponse {
+  n: number;
+  method_used: string;
+  is_auto_selected: boolean;
+  test_name: string;
+  statistic: number;
+  p_value: number;
+  alpha: number;
+  is_normal: boolean;
+  decision_text: string;
+  conclusion_text: string;
+}
+
+interface ResultDisplayProps {
+  result: CalculateResponse;
+}
+
+export function ResultDisplay({ result }: ResultDisplayProps) {
+  const isNormal = result.is_normal;
 
   return (
     <div className="glass-card animate-in fade-in zoom-in-95 duration-500 overflow-hidden relative">
@@ -23,26 +39,26 @@ export function ResultDisplay() {
         <div className="space-y-4">
           <div className="flex justify-between items-center p-4 bg-black/20 rounded-xl border border-white/5">
             <span className="text-gray-400">Jumlah Sampel (N)</span>
-            <span className="font-mono text-lg font-semibold text-white">156</span>
+            <span className="font-mono text-lg font-semibold text-white">{result.n}</span>
           </div>
           <div className="flex justify-between items-center p-4 bg-black/20 rounded-xl border border-white/5">
             <span className="text-gray-400">Metode Uji</span>
             <span className="font-medium text-blue-400 text-right">
-              <span className="block text-xs text-blue-400/70 mb-0.5">Dipilih otomatis:</span>
-              Jarque Bera
+              {result.is_auto_selected && <span className="block text-xs text-blue-400/70 mb-0.5">Dipilih otomatis:</span>}
+              {result.test_name}
             </span>
           </div>
           <div className="flex justify-between items-center p-4 bg-black/20 rounded-xl border border-white/5">
             <span className="text-gray-400">Statistic</span>
-            <span className="font-mono text-lg font-semibold text-white">2.138</span>
+            <span className="font-mono text-lg font-semibold text-white">{result.statistic.toFixed(4)}</span>
           </div>
           <div className="flex justify-between items-center p-4 bg-black/20 rounded-xl border border-white/5">
             <span className="text-gray-400">p-value</span>
-            <span className="font-mono text-lg font-semibold text-white">0.118</span>
+            <span className="font-mono text-lg font-semibold text-white">{result.p_value.toFixed(4)}</span>
           </div>
           <div className="flex justify-between items-center p-4 bg-black/20 rounded-xl border border-white/5">
             <span className="text-gray-400">Alpha (α)</span>
-            <span className="font-mono text-lg font-semibold text-white">0.05</span>
+            <span className="font-mono text-lg font-semibold text-white">{result.alpha}</span>
           </div>
         </div>
 
@@ -60,13 +76,13 @@ export function ResultDisplay() {
             </h3>
             
             <p className={`text-sm ${isNormal ? 'text-green-300/80' : 'text-red-300/80'} mb-6`}>
-              {isNormal ? "✅ Gagal menolak H0 (p ≥ α)" : "❌ Tolak H0 (p < α)"}
+              {result.decision_text}
             </p>
 
             <div className="w-full bg-black/40 p-4 rounded-lg text-left border border-white/5">
               <p className="text-xs text-gray-400 mb-1">Kesimpulan:</p>
               <p className="text-sm text-gray-200">
-                Karena p-value (0.118) ≥ 0.05 maka gagal menolak H0. Tidak terdapat bukti yang cukup bahwa data tidak berdistribusi normal.
+                {result.conclusion_text}
               </p>
             </div>
           </div>
