@@ -13,7 +13,7 @@ export function TestConfig({ method, onMethodChange, alpha, onAlphaChange }: Tes
   return (
     <div className="glass-card mb-8">
       <h2 className="text-xl font-semibold mb-6 flex items-center">
-        <span className="bg-purple-500/20 text-purple-400 p-2 rounded-lg mr-3">2</span>
+        <span className="bg-purple-500/20 text-purple-400 p-2 rounded-lg mr-3">3</span>
         Konfigurasi Uji
       </h2>
 

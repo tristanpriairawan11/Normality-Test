@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Header } from "@/components/Header";
 import { DataInput } from "@/components/DataInput";
+import { HistogramChart } from "@/components/HistogramChart";
 import { TestConfig } from "@/components/TestConfig";
 import { ResultDisplay, CalculateResponse } from "@/components/ResultDisplay";
 import { RotateCcw, Play, AlertTriangle } from "lucide-react";
@@ -69,6 +70,9 @@ export default function Home() {
         
         <div className="space-y-6">
           <DataInput onDataReady={setData} />
+          
+          <HistogramChart data={data} />
+
           <TestConfig 
             method={method} 
             onMethodChange={setMethod} 
@@ -109,7 +113,7 @@ export default function Home() {
           {/* Results */}
           {result && (
             <div className="mt-8 animate-in fade-in slide-in-from-bottom-8 duration-500" id="results">
-              <ResultDisplay result={result} />
+              <ResultDisplay result={result} data={data} />
             </div>
           )}
         </div>

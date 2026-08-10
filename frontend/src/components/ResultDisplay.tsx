@@ -1,6 +1,9 @@
 "use client";
 
+import { useState } from "react";
+
 import { Download, FileText, CheckCircle2, XCircle, Calculator } from "lucide-react";
+import { QQPlotChart } from "./QQPlotChart";
 
 export interface CalculateResponse {
   n: number;
@@ -17,9 +20,11 @@ export interface CalculateResponse {
 
 interface ResultDisplayProps {
   result: CalculateResponse;
+  data: number[];
 }
 
-export function ResultDisplay({ result }: ResultDisplayProps) {
+export function ResultDisplay({ result, data }: ResultDisplayProps) {
+  const [showQQPlot, setShowQQPlot] = useState(false);
   const isNormal = result.is_normal;
 
   return (
@@ -88,6 +93,17 @@ export function ResultDisplay({ result }: ResultDisplayProps) {
           </div>
         </div>
       </div>
+
+      <div className="mb-6 flex justify-center">
+        <button 
+          onClick={() => setShowQQPlot(!showQQPlot)}
+          className="btn-secondary text-sm px-4 py-2"
+        >
+          {showQQPlot ? "Sembunyikan QQ Plot" : "Tampilkan Visualisasi QQ Plot"}
+        </button>
+      </div>
+
+      {showQQPlot && <QQPlotChart data={data} />}
 
       {/* Downloads */}
       <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-white/10">
