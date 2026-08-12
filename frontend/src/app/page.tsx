@@ -7,7 +7,7 @@ import { HistogramChart } from "@/components/HistogramChart";
 import { TestConfig } from "@/components/TestConfig";
 import { ResultDisplay, CalculateResponse } from "@/components/ResultDisplay";
 import { DataTransformation } from "@/components/DataTransformation";
-import { RotateCcw, Play, AlertTriangle } from "lucide-react";
+import { RotateCcw, Play, AlertTriangle, Download } from "lucide-react";
 
 export default function Home() {
   const [data, setData] = useState<number[]>([]);
@@ -27,6 +27,17 @@ export default function Home() {
   const [transformedResult, setTransformedResult] = useState<CalculateResponse | null>(null);
   const [isCalculatingTransformed, setIsCalculatingTransformed] = useState(false);
   const [transformedError, setTransformedError] = useState<string | null>(null);
+
+  const handleDataReady = (newData: number[]) => {
+    setData(newData);
+    // Reset all results when new data is inputted
+    setResult(null);
+    setError(null);
+    setTransformedData(null);
+    setTransformError(null);
+    setTransformedResult(null);
+    setTransformedError(null);
+  };
 
   const handleCalculate = async () => {
     if (data.length < 3) {
@@ -64,14 +75,8 @@ export default function Home() {
   };
 
   const handleReset = () => {
-    setResult(null);
-    setError(null);
-    setTransformedData(null);
-    setTransformError(null);
-    setTransformedResult(null);
-    setTransformedError(null);
-    // Complete reset of child components would require more state lifting,
-    // but hiding results and errors is enough for now.
+    // A complete hard reset to return the app to its original state
+    window.location.reload();
   };
 
   const handleTransform = async (transformMethod: string) => {
@@ -139,6 +144,18 @@ export default function Home() {
     }
   };
 
+  const handleDownloadTransformed = () => {
+    if (!transformedData) return;
+    const csvContent = "data:text/csv;charset=utf-8," + "Index,Transformed_Value\n" + transformedData.map((val, idx) => `${idx + 1},${val}`).join("\n");
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `transformed_data.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
       {/* Abstract background shapes */}
@@ -149,7 +166,7 @@ export default function Home() {
         <Header />
         
         <div className="space-y-6">
-          <DataInput onDataReady={setData} />
+          <DataInput onDataReady={handleDataReady} />
           
           <HistogramChart data={data} />
 
@@ -216,8 +233,44 @@ export default function Home() {
           {transformedData && (
             <div className="mt-12 pt-12 border-t border-white/10 animate-in fade-in duration-500 space-y-6">
               <div className="mb-6">
-                <h2 className="text-2xl font-heading font-bold text-white mb-2">Analisis Data Hasil Transformasi</h2>
-                <p className="text-gray-400">Visualisasi dan uji normalitas untuk data yang telah ditransformasikan.</p>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+                  <div>
+                    <h2 className="text-2xl font-heading font-bold text-white mb-2">Analisis Data Hasil Transformasi</h2>
+                    <p className="text-gray-400">Visualisasi dan uji normalitas untuk data yang telah ditransformasikan.</p>
+                  </div>
+                  <button
+                    onClick={handleDownloadTransformed}
+                    className="flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-colors text-sm border border-white/10"
+                  >
+                    <Download className="w-4 h-4" />
+                    Download CSV
+                  </button>
+                </div>
+
+                {/* Data Preview */}
+                <div className="bg-white/5 p-4 rounded-xl border border-white/10 mt-4">
+                  <p className="text-sm text-gray-300 font-medium mb-3">Preview Data Hasil Transformasi (5 Baris Pertama):</p>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm text-left text-gray-300">
+                      <thead className="text-xs text-gray-400 uppercase bg-black/40">
+                        <tr>
+                          <th className="px-4 py-2 border-b border-white/5 w-16">No</th>
+                          <th className="px-4 py-2 border-b border-white/5">Nilai Transformasi</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {transformedData.slice(0, 5).map((val, idx) => (
+                          <tr key={idx} className="border-b border-white/5 last:border-0">
+                            <td className="px-4 py-2 text-gray-500">{idx + 1}</td>
+                            <td className="px-4 py-2 bg-primary-500/10 font-medium text-white">
+                              {val.toFixed(4)}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
               </div>
               
               <HistogramChart data={transformedData} />

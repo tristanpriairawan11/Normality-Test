@@ -67,6 +67,11 @@ export function HistogramChart({ data }: HistogramChartProps) {
   };
 
   useEffect(() => {
+    // Reset the chart visibility when data changes so it acts "like beginning"
+    setShowChart(false);
+  }, [data]);
+
+  useEffect(() => {
     if (data && data.length > 0 && showChart) {
       fetchHistogram(bins > 0 ? bins : undefined);
     } else {
